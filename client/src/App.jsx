@@ -16,24 +16,30 @@ import './App.css'
 function App() {
 
     const [user, setUser] = useState({})
+    const [authIsReady, setAuthIsReady] = useState(false)
 
     let navigate = useNavigate()
 
     async function authentication(req, res){
+        let newUser
         try {
             let token = JSON.parse(localStorage.getItem('token'))
-            const response = await axios.get('/api/users', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            console.log(response)
-            setUser(response.data)
+            if (token) {
+                const response = await axios.get('/api/users', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                console.log(response)
+                newUser = response.data            
+                setUser(newUser) 
+            }
             
         }catch(err) {
             console.log(err.message)
             localStorage.clear()
         }
+        setAuthIsReady(true)
     }
 
     useEffect(() => {
@@ -43,13 +49,14 @@ function App() {
     return ( 
         <div className="app">
             <Navbar username={user.username} setUser={setUser} />
-            <Routes>
+            {authIsReady && (<Routes>
                 <Route path="/" element={<Home />} />
-                {user.username ? <Route path="/profile" element={<Profile username={user.username} email={user.email} />} /> : <Route path="*" element={<Navigate to="/login" />} />}
-                {user.username ? <Route path="/login" element={<Navigate to="/" />} /> : <Route path="/login" element={<Login setUser={setUser} />} /> }
-                {user.username ? <Route path="/register" element={<Navigate to="/" />} /> : <Route path="/login" element={<Login setUser={setUser} />} /> }
-                <Route path="/register" element={<Register setUser={setUser} />} />
-            </Routes>
+
+                <Route path="/profile" element={ user.username ? <Profile username={user.username} email={user.email} /> : <Navigate to="/login" />} />
+                <Route path="/login" element={ !user.username ? <Login setUser={setUser} /> : <Navigate to='/' />} /> 
+                <Route path="/register" element={ !user.username ? <Register setUser={setUser} /> : <Navigate to='/' />} /> 
+            </Routes>)}
+            
         </div>
      );
 }

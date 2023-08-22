@@ -18,7 +18,7 @@ async function register(req, res) {
     // 2. If they don't exist, encrypt their password
 
         const encryptedPassword = await bcrypt.hash(req.body.password, Number(process.env.SALT_ROUNDS))
-
+  
     // 3. Add new user to the database with encrypted password
 
         const newUser = await User.create({ ...req.body, password: encryptedPassword })
