@@ -20,6 +20,30 @@ function Login({ setUser }) {
     }
 
     const handleSubmit = async (e) => {
+        e.preventDefault()
+        console.log('handle submit login')
+        try {
+            // let token = JSON.parse(localStorage.getItem('token'))
+            // console.log(token)
+
+            const response = await axios.post('/auth/login', { ...form })
+            let token = response.data.token
+            localStorage.setItem('token', JSON.stringify(token))          
+            console.log('end of handlesubmit, token:')
+            console.log(token)
+
+            
+            const { data } = await axios.get('/api/users', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            
+            setUser(data)
+            navigate('/profile')
+        } catch(err) {
+            console.log(err.message)
+        }
     }
 
     return ( 

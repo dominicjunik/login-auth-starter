@@ -4,6 +4,8 @@ import icon from '../assets/react.svg'
 function Navbar({ username, setUser }) {
   
   const logout = () => {
+    localStorage.clear()
+    setUser({})
   };
 
   return (

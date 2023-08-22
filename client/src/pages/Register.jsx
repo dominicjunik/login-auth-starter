@@ -20,6 +20,28 @@ function Register({ setUser }) {
     }
 
     const handleSubmit = async (e) => {
+        e.preventDefault()
+        console.log('handle submit register')
+        try {
+            const response = await axios.post('/auth/register', { ...form })
+            let token = response.data.token
+            localStorage.setItem('token', JSON.stringify(token))
+            console.log('end of handlesubmit, token:')
+            console.log(token)
+
+            const { data } = await axios.get('/api/users', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            
+            setUser(data)
+            navigate('/profile')
+        } catch(err) {
+            console.log(err.message)
+        }
+        
+        
     }
 
     return ( 
